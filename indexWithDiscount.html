@@ -1,0 +1,408 @@
+<html>
+<head>
+  <title>AIESEC en México</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="cache-control" content="no-cache">
+    <link rel="icon" type="image/x-png" href="./assets/images/favicon.png">
+    <script type="text/javascript" 
+    src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script type="text/javascript" 
+    src="https://openpay.s3.amazonaws.com/openpay.v1.min.js"></script>
+
+    <script type='text/javascript' 
+    src="https://openpay.s3.amazonaws.com/openpay-data.v1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/main.css">
+    <script type="text/javascript">
+    $(document).ready(function() {
+
+
+        //openPay vlaidations
+        //OpenPay.setId('mubypwi638te5k2z4q9c');
+        //OpenPay.setApiKey('pk_4981f6da36014523948d66211ba56258');
+        //OpenPay.setSandboxMode(true);
+        OpenPay.setId('mwgdi1x7t1wmrhf1dxbj');
+        OpenPay.setApiKey('pk_9f5e6fc2a3ac47a5a133bf3b2af6f4c8');
+        OpenPay.setSandboxMode(false);
+        
+        //console.log(OpenPay.getSandboxMode());
+        
+        var deviceSessionId = OpenPay.deviceData.setup("payment-form", "deviceIdHiddenFieldName");
+        //getting the info od the app id and the LC
+        var params = window.location.search.substr(1).split('&');
+        var app_id = null;
+        
+        if (params.length == 1 ){
+            app_id = params[0].split('=')[1];
+
+        }else if(params.length == 2 ){
+            app_id = params[0].split('=')[1];
+            var lc = params[1].split('=')[1];
+            //setting in the picker the lc that was passed iin the parameters
+            if (lc != null){
+                var lc_select = document.getElementById('committee');
+                lc_select.value = lc;
+            }
+
+        }
+        if (app_id != null){
+            $('<input />').attr('type', 'hidden')
+            .attr('name', "app_id")
+            .attr('value', app_id)
+            .appendTo('#payment-form');    
+        }
+
+
+        $('#pay-button').on('click', function(event) {
+           
+
+            if(checkFields()){
+                event.preventDefault();
+                $("#pay-button").prop( "disabled", true);
+                //console.log(OpenPay);
+                //console.log(OpenPay.token);
+                OpenPay.token.extractFormAndCreate('payment-form', sucess_callbak, error_callbak); 
+            }               
+        });
+
+        var sucess_callbak = function(response) {
+            //
+            //console.log(JSON.stringify(response));
+            var token_id = response.data.id;
+            //console.log("exitooooo "+token_id);
+
+            $('#token_id').val(token_id);
+            //$('#payment-form').submit();
+
+
+            var amount= document.getElementById("amount").value;
+            var participante= document.getElementById("name_participant").value;
+            var mail= document.getElementById("email").value;
+            var phone= document.getElementById("phone_number").value;
+            var committee= document.getElementById("committee").value;
+
+
+            //Add extra values before submit
+            $("#payment-form").submit( function(eventObj) {
+                $('<input />').attr('type', 'hidden')
+                .attr('name', "amount")
+                .attr('value', amount)
+                .appendTo('#payment-form');
+                $('<input />').attr('type', 'hidden')
+                .attr('name', "name_participant")
+                .attr('value', participante)
+                .appendTo('#payment-form');
+                $('<input />').attr('type', 'hidden')
+                .attr('name', "email")
+                .attr('value', mail)
+                .appendTo('#payment-form');
+                $('<input />').attr('type', 'hidden')
+                .attr('name', "committee")
+                .attr('value', committee)
+                .appendTo('#payment-form');
+                $('<input />').attr('type', 'hidden')
+                .attr('name', "phone_number")
+                .attr('value', phone)
+                .appendTo('#payment-form');
+
+                return true;
+            });
+            $('#payment-form').submit();
+        };
+           //};
+        //
+        $( "#amount" ).on("change",function() {
+            //console.log("cambiaste un valor");
+            document.getElementById("amount_text").value= "$ "+document.getElementById("amount").value+" mxn"; });
+
+        var error_callbak = function(response) {
+            var desc = response.data.description != undefined ? response.data.description : response.message;
+            alert("ERROR [" + response.status + "] " + desc);
+            $("#pay-button").prop("disabled", false);
+            //console.log("erorrrr "+desc)
+            };
+        });
+    //Full form fields validations 
+    function checkFields(){
+        if( document.getElementById("holder_name").value == "" )
+        {
+
+            //alert( "Escribe nombre en la Tarjetas" );
+            show_modal("Escribe nombre en la Tarjetas");   
+            document.getElementById("holder_name").focus();
+            return false;
+        }
+        if(! OpenPay.card.validateCardNumber(document.getElementById("card_number").value))
+        {
+            show_modal("Verifica el número de la tarjeta");
+            document.getElementById("card_number").focus();
+            
+            return false;
+        }if(! OpenPay.card.validateExpiry(document.getElementById("expiration_month").value,"20"+document.getElementById("expiration_year").value))
+        {
+            show_modal("Verifica la caducidad de tu tarjeta" );
+            document.getElementById("expiration_year").focus();
+            
+            return false;
+        }if(! OpenPay.card.validateCVC(document.getElementById("cvv2").value))
+        {
+            show_modal("Verifica el numero de seguridad" );
+            document.getElementById("cvv2").focus();
+            
+            return false;
+        }if( document.getElementById("name_participant").value == "" )
+        {
+            show_modal("Escribe el nombre del participante");
+            document.getElementById("name_participant").focus();
+            
+            return false;
+        }
+        var re = /^\s*[\w\-\+_]+(\.[\w\-\+_]+)*\@[\w\-\+_]+\.[\w\-\+_]+(\.[\w\-\+_]+)*\s*$/;
+        if(!re.test(document.getElementById("email").value ))
+        {
+            show_modal( "Escribe el correo electrónico del participante" );
+            document.getElementById("email").focus();
+            
+            return false;
+        }if( document.getElementById("phone_number").value == "" )
+        {
+            show_modal("Escribe el teléfono del participante" );
+            document.getElementById("phone_number").focus();
+            
+            return false;
+        }
+        if (!document.getElementById("terms").checked){
+         show_modal("Debes aceptar los terminos y condiciones" );
+
+
+         return false;   
+     }
+     //console.log(document.getElementById("terms").checked);
+     return true;
+
+ }
+
+ function show_modal(message){
+                //getting ready the modal window
+                var modal = document.getElementById('myModal');
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        //getting ready the modal window
+        document.getElementById("modal_text").innerHTML = message;
+        modal.style.display = "block";
+    }
+    </script>
+</head>
+<body>
+    <section class="center-align">
+        <div class="bkng-tb-cntnt   ">
+            <div class="pymnts">
+
+                <div class="pymnt-itm card active">
+                    <div id= "div_blue" style="background-color=#037Ef3">
+                        <img src="./css/AIESEC_log.png" alt="Mountain View" style="width:208px;height:32px;">
+                    </div>
+
+                    <div class="pymnt-cntnt ">
+                        <div class="card-expl">
+                            <div class="credit"><h4>Tarjetas de crédito</h4></div>
+                            <div class="debit" ><h4>Tarjetas de débito</h4></div>
+                        </div>
+                        <form action="./php/payment.php" method="POST" id="payment-form">
+                            <input type="hidden" name="token_id" id="token_id">
+                            <!--test-->
+
+                            <div class="sctn-col" style="padding-left:25px;">
+
+                                <div style="padding-top: 15px;" class="input-name">
+                                    <label>Nombre del titular</label><span class="required">*</span>
+                                    <input type="text" placeholder="Como aparece en la tarjeta" autocomplete="off" data-openpay-card="holder_name" id="holder_name"
+                                    required
+                                    oninvalid="this.setCustomValidity('Ingresa tu apellido')"
+                                    oninput="setCustomValidity('')">
+                                </div>
+                                <div style="padding-top: 15px;">
+                                    <label>Número de tarjeta</label><span class="required">*</span>
+                                    <input type="text" autocomplete="off" data-openpay-card="card_number" id="card_number" required>
+                                </div>
+                                <div style="padding-top: 15px;">
+                                    <label>Fecha de expiración</label>
+                                    <div class"row">
+                                        <div class="col s1 m2 l2"><span class="required">*</span>
+                                            <input type="text" placeholder="Mes" data-openpay-card="expiration_month" id="expiration_month" style="width:130px; padding-right:30px;" required>
+                                        </div>
+
+                                        <div class="col s1 m2 l2" style="padding-left: 30px;"><span class="required">*</span>
+                                            <input type="text" placeholder="Año" data-openpay-card="expiration_year" id="expiration_year" style="width:130px;" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="sctn-col l cvv" style="padding-top: 15px;">
+                                    <label>Código de seguridad</label><span class="required">*</span>
+                                    <div class="sctn-col half l"><input type="text" placeholder="3-4 dígitos" autocomplete="off" data-openpay-card="cvv2" id="cvv2" required>
+                                    </div>
+                                </div>
+                                <div  style="padding-top: 15px;">
+
+                                  <input checked="" id="terms" name = "terms" type="checkbox" style="display:inline;">
+                                  <span>
+                                      <a href="https://opportunities.aiesec.org/assets/terms.pdf" target="_blank"  style="text-decoration: underline;" style="display:inline;" > He leido y acepto los terminos y condiciones.</a>
+
+                                  </span>
+
+                                  
+                                  
+                              </div>
+                              <div  style="padding-top: 15px;">
+                                <a class="button rght" id="pay-button" style="background-color:#037Ef3;">Donar</a>
+                            </div>
+                        </div>
+                    </form>
+
+
+
+                    <div class="sctn-col " style="padding-left:25px;">
+
+                        <div style="padding-top: 15px;">
+                            <label>Nombre del Participante</label><span class="required">*</span>
+                            <input type="text" placeholder="Nombre Completo" autocomplete="off" data-openpay-card="name_participant" id="name_participant">
+                        </div>
+                        <div style="padding-top: 15px;">
+                            <label>Correo Electrónico</label><span class="required">*</span>
+                            <input type="email" autocomplete="on"  required id="email" data-openpay-card="email">
+                        </div>
+                        <div class="sctn-col" style="padding-top: 15px;">
+                            <label>Número de teléfono</label><span class="required">*</span>
+                            <input type="tel" autocomplete="on" data-openpay-card="phone_number" id="phone_number" data-openpay-card="phone_number">
+                        </div>
+                        <div style="padding-top: 15px;">
+                            <label>Selecciona tu producto </label>
+                            <div class"row">
+                                <div class="col s1 m2 l2" style="padding-top: 15px;" >
+                                    <select id="amount" data-openpay-card="amount" style=" width:130px;">
+                                        <option value="2950">Voluntario Global </option>
+                                        <option value="4450">Emprendedor Global</option>
+                                        <option value="5950">Talento Global</option>
+
+                                    </select>
+
+                                </div>
+                                <div class="col s1 m2 l2" style="padding-left: 30px;">
+                                    <input id="amount_text" type="text" placeholder="Año"  value="$ 2950 mxn" readonly style=" width:130px;">
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding-top: 15px;">
+                            <label>Selecciona tu Oficina Local</label>
+                            <div class"row">
+                                <div class="col s1 m2 l2" style="padding-top: 15px;" >
+                                    <select id="committee" name="committee" style="width:130px;">
+                                        <option value="Otro" selected disabled>Selecciona...</option>
+                                        <option value="Virtual Expansions">Oficina Nacional</option>
+                                        <option value="Aguascalientes">Aguascalientes</option>
+                                        <option value="Celaya">Celaya</option>
+                                        <option value="Chihuahua">Chihuahua</option>
+                                        <option value="Ciudad Juárez">Ciudad Juárez</option>
+                                        <option value="Ciudad Victoria">Ciudad Victoria</option>
+                                        <option value="Guadalajara">Guadalajara</option>
+                                        <option value="Guanajuato">Guanajuato</option>
+                                        <option value="Hidalgo">Hidalgo</option>
+                                        <option value="IPN">IPN</option>
+					<option value="Irapuato">Irapuato</option>
+                                        <option value="ITAM">ITAM</option>
+                                        <option value="ITESM CEM">ITESM CEM</option>
+                                        <option value="ITESM Monterrey">ITESM Monterrey</option>
+                                        <option value="ITESM Santa Fe">ITESM Santa Fe</option>
+                                        <option value="ITESM Toluca">ITESM Toluca</option>
+                                        <option value="La Laguna">La Laguna</option>
+                                        <option value="La Salle">La Salle</option>
+                                        <option value="León">León</option>
+                                        <option value="Los Mochis">Los Mochis</option>
+                                        <option value="Michoacán">Michoacán</option>
+                                        <option value="Morelos">Morelos</option>
+                                        <option value="Nayarit">Nayarit</option>
+                                        <option value="Oaxaca">Oaxaca</option>
+                                        <option value="Puebla">Puebla</option>
+                                        <option value="Querétaro">Querétaro</option>
+                                        <option value="Sinaloa">Sinaloa</option>
+                                        <option value="Sonora">Sonora</option>
+                                        <option value="Tabasco">Tabasco</option>
+                                        <option value="Tampico">Tampico</option>
+                                        <option value="UAEMEX">UAEMEX</option>
+                                        <option value="UDEM">UDEM</option>
+                                        <option value="UNAM">UNAM</option>
+                                        <option value="UP">UP</option>
+                                        <option value="Veracruz">Veracruz</option>
+                                        <option value="Yucatán">Yucatán</option>
+                                        <option value="Zacatecas">Zacatecas</option>
+                                        <option value="Otro">Otra...</option>
+                                        
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--test-->
+
+                    <!--ICONOS-->
+
+                    <div class="sctn-row center-align">
+                     <div class="sctn-colA  center-align">
+                        <img src="./css/gv.png" alt="Mountain View" style="width:184px;height:184px;">
+                        <h5>Sé un voluntario internacional, apoya comunidades, conoce el mundo y experimenta la aventura de tu vida.
+                        </h5>
+                        <h5><strike>$3950</strike><br>$2950 (17 y 18 de Noviembre)</h5>
+                    </div>
+                    <div class="sctn-colA  center-align">
+                        <img src="./css/ge.png" alt="Mountain View" style="width:184px;height:184px;">
+                        <h5>Sé un emprendedor internacional y vive la vida de un emprendedor en el exterior.
+                        </h5>
+                        <h5>$4450</h5>
+                    </div>
+                    <div class="sctn-colA  center-align">
+                        <img src="./css/gt.png" alt="Mountain View" style="width:184px;height:184px;">
+                        <h5>Sé un practicante internacional y explora las oportunidades en el exterior que te ayudarán a construir tu futuro. 
+                        </h5>
+                        <h5>$5950</h5>
+                    </div>
+
+
+
+                </div>
+                <!--ICONOS-->
+                <div class="openpay">
+                    <div class="logo">Transacciones realizadas vía:</div>
+                    <div class="shield">Tus donaciones se realizan de forma segura con encriptación de 256 bits</div>
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<!-- The Modal -->
+<div id="myModal" class="modal" >
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">x</span>
+    <h2 id="modal_text">Some text in the Modal..</h2>
+</div>
+
+</div>
+</section>
+</body>
+</html>
