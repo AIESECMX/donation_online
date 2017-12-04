@@ -14,10 +14,18 @@
     <link rel="stylesheet" type="text/css" href="./css/main.css">
     <script type="text/javascript">
     $(document).ready(function() {
+        var sandbox = true;
 
-        OpenPay.setId('mwgdi1x7t1wmrhf1dxbj');
-        OpenPay.setApiKey('pk_9f5e6fc2a3ac47a5a133bf3b2af6f4c8');
-        OpenPay.setSandboxMode(false);
+        if(!sandbox) {
+            OpenPay.setId('mwgdi1x7t1wmrhf1dxbj');
+            OpenPay.setApiKey('pk_9f5e6fc2a3ac47a5a133bf3b2af6f4c8');
+            OpenPay.setSandboxMode(false);
+        }
+        else {
+            OpenPay.setId('mubypwi638te5k2z4q9c');
+            OpenPay.setApiKey('pk_4981f6da36014523948d66211ba56258');
+            OpenPay.setSandboxMode(true);
+        }
         
         //console.log(OpenPay.getSandboxMode());
         

@@ -1,11 +1,11 @@
 <?php
-require_once '/home/webmaster/wp-config-files/vendor/autoload.php';
-require '/home/webmaster/vendor/phpmailer/phpmailer/PHPMailerAutoload.php';
-require '/home/webmaster/wp-config-files/gis_lib/vendor/autoload.php';
+require_once '../vendor/autoload.php';
+//require '/home/webmaster/vendor/phpmailer/phpmailer/PHPMailerAutoload.php';
+//require '/home/webmaster/wp-config-files/gis_lib/vendor/autoload.php';
 
 try{
-
-	$configs = include('/home/webmaster/wp-config-files/payment_congif.php');
+	$configs = include('./payment_config.php');
+	//$configs = include('/home/webmaster/wp-config-files/payment_congif.php');
 
 }catch (Exception $e) {
 	$lc_n=$_POST["committee"];
@@ -14,22 +14,15 @@ try{
 	//	header("Location:https://aiesec.org.mx/error_de_transaccion/");		
 }
 
-$test = FALSE;
-if (!$test){
-
-	Openpay::setId($configs['oepnpay_id']);
+$test = TRUE;
+if (!$test) {
+	Openpay::setId($configs['openpay_id']);
 	Openpay::setApiKey($configs['openpay_private_key']);
 	Openpay::setProductionMode(true);
-	$openpay = Openpay::getInstance($configs['oepnpay_id'], 
-		$configs['openpay_private_key']);
-
-
-}else{
-	Openpay::setId("mubypwi638te5k2z4q9c");
-	Openpay::setApiKey("sk_7506b2fe861c455a816b4df8a07547f0");
-
-	$openpay = Openpay::getInstance("mubypwi638te5k2z4q9c", 
-		"sk_7506b2fe861c455a816b4df8a07547f0");
+	$openpay = Openpay::getInstance($configs['openpay_id'],$configs['openpay_private_key']);
+}
+else{
+	$openpay = Openpay::getInstance($configs['openpay_sandbox_id'],$configs['openpay_sandbox_private_key']);
 }
 
 $nombre = $_POST["amount"];
@@ -69,7 +62,7 @@ switch (sizeof($pieces)) {
 		//# code...
 	break;
 }
-$committees_j = '/home/webmaster/wp-config-files/pay_online_mailin.json';
+$committees_j = './pay_online_mailing.json';
 $json_com = file_get_contents($committees_j, false, stream_context_create($arrContextOptions)); 
 $committee_mails = json_decode($json_com,true); 
 $mails = $committee_mails[$_POST["committee"]];
@@ -156,7 +149,7 @@ try{
 //echo "<br>mail 1 <br>".$mail_def;
 //echo "<br>mail 2 <br>".$mail_pr;
 
-	header("Location:https://aiesec.org.mx/gracias-por-tu-donativo/");
+	//header("Location:https://aiesec.org.mx/gracias-por-tu-donativo/");
 
 
 
@@ -209,7 +202,7 @@ try{
 	$mail->addCC($mail_def);
 	$mail->addCC($mail_pr);
 	$mail->addCC('webmaster@aiesec.org.mx');
-	$mail->addCC('finance.legal@aiesec.org.mx');
+	//$mail->addCC('finance.legal@aiesec.org.mx');
 	$mail->Send();
 
 	if($logging_flag == true) {
@@ -218,6 +211,8 @@ try{
 		$logdataa=date('[Y/m/d H:i:s]').": $nombre $apellido, $lc_n".PHP_EOL;
 		file_put_contents("./discounted_donations.log",$logdataa,FILE_APPEND);
 	}
+
+	echo "Done";
 
 
 }catch (Exception $e) {
