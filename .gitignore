@@ -2,3 +2,4 @@
 vendor/**
 **/*config.php
 **/pay_online_mailing.json
+**/.DS_Store

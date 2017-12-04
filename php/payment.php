@@ -3,6 +3,8 @@ require_once '../vendor/autoload.php';
 //require '/home/webmaster/vendor/phpmailer/phpmailer/PHPMailerAutoload.php';
 //require '/home/webmaster/wp-config-files/gis_lib/vendor/autoload.php';
 
+$test = TRUE;
+
 try{
 	$configs = include('./payment_config.php');
 	//$configs = include('/home/webmaster/wp-config-files/payment_congif.php');
@@ -11,10 +13,14 @@ try{
 	$lc_n=$_POST["committee"];
         $logdataa=date('[Y/m/d H:i:s]').": 500 Could not Load, $lc_n, ".$e->getMessage().PHP_EOL;
         file_put_contents("./error.log",$logdataa,FILE_APPEND);
-	//	header("Location:https://aiesec.org.mx/error_de_transaccion/");		
+    if(!$test) {
+    	header("Location:https://aiesec.org.mx/error_de_transaccion/");	
+    }
+    else {
+    	die("There was an error with payment config"); //Only for debug	
+    }
 }
 
-$test = TRUE;
 if (!$test) {
 	Openpay::setId($configs['openpay_id']);
 	Openpay::setApiKey($configs['openpay_private_key']);
@@ -142,48 +148,6 @@ try{
 	$mail_body = str_replace("{card}",substr($charge->card->card_number,-4),$mail_body);
 
 	//sending confirmation mail
-
-
-
-
-//echo "<br>mail 1 <br>".$mail_def;
-//echo "<br>mail 2 <br>".$mail_pr;
-
-	//header("Location:https://aiesec.org.mx/gracias-por-tu-donativo/");
-
-
-
-/*
-	//mark as paid in expa
-	////mark as paid in expa
-	if(isset($_POST["app_id"])){
-		$expa_keys = include('/home/webmaster/Automatizations/payments/expa_acess.php');
-		$user = new \GISwrapper\AuthProviderCombined(htmlspecialchars($expa_keys['expa_user']), htmlspecialchars($expa_keys['expa_pass']));
-
-		//GETTING THE acces token
-		//GETTING THE acces token
-		//GETTING THE acces token
-		$gis = new \GISwrapper\GIS($user);
-		$user_id =$gis->current_person->get()->person->id;
-		$session_token=$user->getToken();
-
-		$params = '{"application":{"paid":true}}'
-
-		$url = "https://gis-api.aiesec.org/v2/applications/".$_POST["app_id"].".json?access_token=".$session_token;
-		$ch = curl_init(); 				// such as http://example.com/example.xml
-		$headers = array('Content-Type: application/json');
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-		$data = curl_exec($ch);
-		curl_close($ch);
-	}
-	*/
-	/////mark as paid in expa
-	/////mark as paid in expa
-
 
 	$mail = new PHPMailer(); // create a new object
 	$mail->IsSMTP(); 
