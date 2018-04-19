@@ -176,7 +176,7 @@ try{
 		file_put_contents("./discounted_donations.log",$logdataa,FILE_APPEND);
 	}
 
-	echo "Done";
+	echo "Hecho, revisa tu correo para obtener tu comprobante.";
 
 
 }catch (Exception $e) {

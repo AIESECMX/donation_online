@@ -257,12 +257,14 @@ a.button.disabled {
     background-image: url("./cards2.png") ;
     margin-left: 20px ;
     width: 540px ;
+    float: left;
 }
 .card-expl div.credit {
     background-image: url("./cards1.png") ;
     border-right: 1px solid #ccc ;
     margin-left: 30px ;
     width: 209px ;
+    float: left;
 }
 .card-expl h4 {
     font-weight: 400 ;
