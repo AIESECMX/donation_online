@@ -1,7 +1,5 @@
 <?php
 require_once '../vendor/autoload.php';
-//require '/home/webmaster/vendor/phpmailer/phpmailer/PHPMailerAutoload.php';
-//require '/home/webmaster/wp-config-files/gis_lib/vendor/autoload.php';
 
 $test = TRUE;
 
