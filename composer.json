@@ -2,6 +2,7 @@
     "require": {
         "phpmailer/phpmailer": "^5.2",
         "openpay/sdk": "^1.2",
-        "google/recaptcha": "~1.1"
+        "google/recaptcha": "~1.1",
+        "predis/predis": "^1.1"
     }
 }

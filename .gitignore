@@ -1,5 +1,5 @@
 **/*.log
 vendor/**
-**/*config.php
+**/*config.*
 **/pay_online_mailing.json
 **/.DS_Store

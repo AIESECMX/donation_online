@@ -23,194 +23,6 @@
 <!--Let browser know website is optimized for mobile-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<script>
-
-$(document).ready(function() {
-    var sandbox = true;
-
-    if(!sandbox) {
-        OpenPay.setId('mwgdi1x7t1wmrhf1dxbj');
-        OpenPay.setApiKey('pk_9f5e6fc2a3ac47a5a133bf3b2af6f4c8');
-        OpenPay.setSandboxMode(false);
-    }
-    else {
-        OpenPay.setId('mubypwi638te5k2z4q9c');
-        OpenPay.setApiKey('pk_4981f6da36014523948d66211ba56258');
-        OpenPay.setSandboxMode(true);
-    }
-    
-    //console.log(OpenPay.getSandboxMode());
-    
-    var deviceSessionId = OpenPay.deviceData.setup("payment-form", "deviceIdHiddenFieldName");
-    //getting the info of the app id and the LC
-    var params = window.location.search.substr(1).split('&');
-    var app_id = null;
-    
-    if (params.length == 1 ) {
-        app_id = params[0].split('=')[1];
-    } else if(params.length == 2 ){
-      app_id = params[0].split('=')[1];
-      var lc = params[1].split('=')[1];
-      //setting in the picker the lc that was passed in the parameters
-      if (lc != null) {
-        var lc_select = document.getElementById('committee');
-        lc_select.value = lc;
-      }
-
-    }
-    if (app_id != null){
-        $('<input />').attr('type', 'hidden')
-        .attr('name', "app_id")
-        .attr('value', app_id)
-        .appendTo('#payment-form');    
-    }
-
-    $('#pay-button').on('click', function(event) {
-        if(checkFields()){
-            event.preventDefault();
-            $("#pay-button").prop("disabled", true);
-            //console.log(OpenPay);
-            //console.log(OpenPay.token);
-            OpenPay.token.extractFormAndCreate('payment-form', success_callbak, error_callbak); 
-        }               
-    });
-
-    var success_callbak = function(response) {
-        //
-        //console.log(JSON.stringify(response));
-        var token_id = response.data.id;
-        //console.log("exitooooo "+token_id);
-
-        $('#token_id').val(token_id);
-        //$('#payment-form').submit();
-
-
-        var amount= document.getElementById("amount").value;
-        var participante= document.getElementById("name_participant").value;
-        var mail= document.getElementById("email").value;
-        var phone= document.getElementById("phone_number").value;
-        var committee= document.getElementById("committee").value;
-
-
-        //Add extra values before submit
-        $("#payment-form").submit( function(eventObj) {
-            $('<input />').attr('type', 'hidden')
-            .attr('name', "amount")
-            .attr('value', amount)
-            .appendTo('#payment-form');
-            $('<input />').attr('type', 'hidden')
-            .attr('name', "name_participant")
-            .attr('value', participante)
-            .appendTo('#payment-form');
-            $('<input />').attr('type', 'hidden')
-            .attr('name', "email")
-            .attr('value', mail)
-            .appendTo('#payment-form');
-            $('<input />').attr('type', 'hidden')
-            .attr('name', "committee")
-            .attr('value', committee)
-            .appendTo('#payment-form');
-            $('<input />').attr('type', 'hidden')
-            .attr('name', "phone_number")
-            .attr('value', phone)
-            .appendTo('#payment-form');
-
-            return true;
-        });
-        $('#payment-form').submit();
-    };
-
-    $( "#amount" ).on("change",function() {
-        //console.log("cambiaste un valor");
-        document.getElementById("amount_text").value= "$ "+document.getElementById("amount").value+" mxn"; });
-
-    var error_callbak = function(response) {
-        var desc = response.data.description != undefined ? response.data.description : response.message;
-        alert("ERROR [" + response.status + "] " + desc);
-        $("#pay-button").prop("disabled", false);
-        //console.log("erorrrr "+desc)
-        };
-    });
-//Full form fields validations 
-function checkFields(){
-    if( document.getElementById("holder_name").value == "" )
-    {
-
-        //alert( "Escribe nombre en la Tarjetas" );
-        show_modal("Escribe nombre en la Tarjetas");   
-        document.getElementById("holder_name").focus();
-        return false;
-    }
-    if(! OpenPay.card.validateCardNumber(document.getElementById("card_number").value))
-    {
-        show_modal("Verifica el número de la tarjeta");
-        document.getElementById("card_number").focus();
-        
-        return false;
-    }if(! OpenPay.card.validateExpiry(document.getElementById("expiration_month").value,"20"+document.getElementById("expiration_year").value))
-    {
-        show_modal("Verifica la caducidad de tu tarjeta" );
-        document.getElementById("expiration_year").focus();
-        
-        return false;
-    }if(! OpenPay.card.validateCVC(document.getElementById("cvv2").value))
-    {
-        show_modal("Verifica el numero de seguridad" );
-        document.getElementById("cvv2").focus();
-        
-        return false;
-    }if( document.getElementById("name_participant").value == "" )
-    {
-        show_modal("Escribe el nombre del participante");
-        document.getElementById("name_participant").focus();
-        
-        return false;
-    }
-    var re = /^\s*[\w\-\+_]+(\.[\w\-\+_]+)*\@[\w\-\+_]+\.[\w\-\+_]+(\.[\w\-\+_]+)*\s*$/;
-    if(!re.test(document.getElementById("email").value ))
-    {
-        show_modal( "Escribe el correo electrónico del participante" );
-        document.getElementById("email").focus();
-        
-        return false;
-    }if( document.getElementById("phone_number").value == "" )
-    {
-        show_modal("Escribe el teléfono del participante" );
-        document.getElementById("phone_number").focus();
-        
-        return false;
-    }
-    if (!document.getElementById("terms").checked){
-      show_modal("Debes aceptar los terminos y condiciones" );
-
-
-      return false;   
-  }
-  //console.log(document.getElementById("terms").checked);
-  return true;
-
-}
-
-function show_modal(message){
-            //getting ready the modal window
-            var modal = document.getElementById('myModal');
-    // Get the <span> element that closes the modal
-    var span = document.getElementsByClassName("close")[0];
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function() {
-        modal.style.display = "none";
-    }
-    // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    }
-    //getting ready the modal window
-    document.getElementById("modal_text").innerHTML = message;
-    modal.style.display = "block";
-}
-</script>
 <style type="text/css">
   fieldset {
     border: 0;
@@ -218,15 +30,21 @@ function show_modal(message){
   fieldset > legend {
     margin-bottom: 0.5em;
   }
+  #div_blue {
+    background-color: #037Ef3;
+    margin-bottom: 1em;
+  }
 </style>
+
 </head>
 <body>
-  <div id="div_blue" style="background-color: #037Ef3;margin-bottom: 1em;">
-    <img src="./css/AIESEC_log.png" alt="Mountain View" style="height:32px;">
+  <div id="div_blue">
+    <img src="./css/AIESEC_logo.png" alt="Mountain View" style="height:32px;">
   </div>
   <div class="container">
     <!-- Métodos de pago aceptados, parte de Openpay -->
     <div class="row">
+      <!-- div tarjetas de crédito -->
       <div class="col s12 m3" style="border-right: 1px solid #ccc ;">
         <div class="row">
           <div class="col s12">
@@ -237,6 +55,7 @@ function show_modal(message){
           </div>
         </div>
       </div>
+      <!-- div tarjetas de débito -->
       <div class="col s12 m9">
         <div class="row">
           <div class="col s12">
@@ -249,7 +68,7 @@ function show_modal(message){
       </div>
     </div>
 
-    <!-- Form -->
+    <!-- Form de pago -->
     <form action="./php/payment.php" method="POST" id="payment-form">
       <fieldset name="card_info">
         <legend>Datos de la tarjeta</legend>
@@ -281,7 +100,7 @@ function show_modal(message){
                 <input type="text" maxlength="4" placeholder="3-4 dígitos" autocomplete="off" data-openpay-card="cvv2" id="cvv2" required>
               </div>
               <div class="col s6 ">
-                <img src="./css/cvv.png" alt="3 dígitos al reverso (4 al frente para AMEX)">
+                <img src="./css/cvv.png" alt="3 dígitos al reverso (4 en el frente para AMEX)">
               </div>
             </div>
           </div>
@@ -292,64 +111,32 @@ function show_modal(message){
         <legend>Datos del participante de intercambio</legend>
         <div class="row">
           <div class="col s12 m6 input-field">
-            <label for="name_participant">Nombre Completo del Participante</label>
-            <input type="text" autocomplete="off" data-openpay-card="name_participant" id="name_participant">
+            <label for="epFirstName">Nombre(s) del Participante</label>
+            <input type="text" autocomplete="on" id="epFirstName" name="epFirstName">
+          </div>
+          <div class="col s12 m6 input-field">
+            <label for="epLastName">Apellido(s) del Participante</label>
+            <input type="text" autocomplete="on" id="epLastName" name="epLastName">
           </div>
           <div class="col s12 m6 input-field">
             <label for="email">Correo Electrónico</label>
-            <input type="email" autocomplete="on" id="email" data-openpay-card="email" required>
+            <input type="email" autocomplete="on" id="email" name="email" required>
           </div>
           <div class="col s12 m6 input-field">
-            <select id="amount" name="amount" data-openpay-card="amount" required>
-              <option value="" disabled selected>Selecciona una opción...</option>
-              <option value="3950">Voluntario Global ($3950)</option>
-              <option value="4450">Emprendedor Global ($4450)</option>
-              <option value="5950">Talento Global ($5950)</option>
+            <label for="phone_number">Número de Teléfono</label>
+            <input type="text" autocomplete="on" id="phone_number" name="phone_number" required>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col s12 m6 input-field">
+            <select id="product" name="product" required>
+              <option value="" data-amount="" disabled selected>Selecciona una opción...</option>
             </select>
-            <label>Selecciona tu producto</label>
+            <label>Selecciona el tipo de donativo</label>
           </div>
           <div class="col s12 m6 input-field">
-            <select id="amount" name="amount" data-openpay-card="amount" required>
+            <select id="committee" name="committee" required>
               <option value="" disabled selected>Selecciona una opción...</option>
-              <option value="Virtual Expansions">Oficina Nacional</option>
-              <option value="Aguascalientes">Aguascalientes</option>
-              <option value="Celaya">Celaya</option>
-              <option value="Chihuahua">Chihuahua</option>
-              <option value="Ciudad Juárez">Ciudad Juárez</option>
-              <option value="Ciudad Obregón">Ciudad Obregón</option>
-              <option value="Guadalajara">Guadalajara</option>
-              <option value="Guanajuato">Guanajuato</option>
-              <option value="IPN">IPN</option>
-              <option value="Irapuato">Irapuato</option>
-              <option value="ITAM">ITAM</option>
-              <option value="ITESM CEM">ITESM CEM</option>
-              <option value="ITESM Monterrey">ITESM Monterrey</option>
-              <option value="ITESM Santa Fe">ITESM Santa Fe</option>
-              <option value="ITESM Toluca">ITESM Toluca</option>
-              <option value="La Laguna">La Laguna</option>
-              <option value="La Salle">La Salle</option>
-              <option value="León">León</option>
-              <option value="Los Mochis">Los Mochis</option>
-              <option value="Michoacán">Michoacán</option>
-              <option value="Morelos">Morelos</option>
-              <option value="Nayarit">Nayarit</option>
-              <option value="Oaxaca">Oaxaca</option>
-              <option value="Poza Rica">Poza Rica</option>
-              <option value="Puebla">Puebla</option>
-              <option value="Querétaro">Querétaro</option>
-              <option value="Sinaloa">Sinaloa</option>
-              <option value="Sonora">Sonora</option>
-              <option value="Tabasco">Tabasco</option>
-              <option value="Tampico">Tampico</option>
-              <option value="Tijuana">Tijuana</option>
-              <option value="UAEMEX">UAEMEX</option>
-              <option value="UDEM">UDEM</option>
-              <option value="UNAM">UNAM</option>
-              <option value="UP">UP</option>
-              <option value="Veracruz">Veracruz</option>
-              <option value="Yucatán">Yucatán</option>
-              <option value="Zacatecas">Zacatecas</option>
-              <option value="Otro">Otra...</option>
             </select>
             <label>¿Con qué oficina local realizaste tu proceso?</label>
           </div>
@@ -358,16 +145,17 @@ function show_modal(message){
 
       <fieldset name="final_check">
         <label>
-          <input type="checkbox" class="filled-in" />
+          <input type="checkbox" class="filled-in" required />
           <span>He leído y estoy de acuerdo con el
             <a href="https://aiesec.org.mx/aviso-de-privacidad" target="_blank" style="display:inline;">Aviso de Privacidad</a> de AIESEC México, A.C.</span>
         </label>
         <div style="padding-top: 15px;">
-          <button class="btn waves-effect waves-light" type="submit" name="action" style="background-color:#037Ef3;">Donar</button>
+          <button id="pay-button" class="btn waves-effect waves-light" type="submit" name="action" style="background-color:#037Ef3;">Donar</button>
         </div>
       </fieldset>
     </form>
 
+    <!-- Product Descriptor -->
     <div class="row">
       <div class="col s12 m4 xl3 offset-xl1">
         <div class="card">
@@ -378,12 +166,12 @@ function show_modal(message){
             <p>Sé un voluntario internacional, apoya comunidades, conoce el mundo y experimenta la aventura de tu vida.</p>
           </div>
           <div class="card-action center-align">
-            <strong>Donativo: $3950</strong>
+            <strong id="ogv-card-amount"></strong>
           </div>
         </div>
       </div>
       <div class="col s12 m4 xl3">
-        <div class="card">
+        <div class="card" id="oge-card">
           <div class="card-image" style="padding:10%">
             <img src="./css/ge.png" alt="Logo Emprendedor Global" />
           </div>
@@ -391,12 +179,12 @@ function show_modal(message){
             <p>Sé un emprendedor internacional y vive la vida de un emprendedor en el exterior.</p><br>
           </div>
           <div class="card-action center-align">
-            <strong>Donativo: $4450</strong>
+            <strong id="oge-card-amount"></strong>
           </div>
         </div>
       </div>
       <div class="col s12 m4 xl3">
-        <div class="card">
+        <div class="card" id="ogt-card">
           <div class="card-image" style="padding:10%">
             <img src="./css/gt.png" alt="Logo Talento Global" />
           </div>
@@ -404,14 +192,14 @@ function show_modal(message){
             <p>Sé un practicante internacional y explora las oportunidades en el exterior que te ayudarán a construir tu futuro.</p>
           </div>
           <div class="card-action center-align">
-            <strong>Donativo: $5950</strong>
+            <strong id="ogt-card-amount"></strong>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Openpay icons requirement -->
+  <!-- Openpay Icons -->
   <div class="row">
     <div class="col s6 m4 l2 offset-m4 offset-l6 row">
       <div class="col s12 center-align" style="font-size:0.7em !important;">Transacciones realizadas vía:</div>
@@ -448,5 +236,9 @@ function show_modal(message){
       $('select').formSelect();
     });
   </script>
+
+  <!-- Load all Donation, LCs and set openpay tokenizer -->
+  <script src="./js/data_config.js"></script>
+  <script src="./js/openpay_setup.js"></script>
 </body>
 </html>
