@@ -39,7 +39,7 @@
 </head>
 <body>
   <div id="div_blue">
-    <img src="./css/AIESEC_logo.png" alt="Mountain View" style="height:32px;">
+    <img src="./css/AIESEC_logo.png" alt="AIESEC logo" style="height:32px;">
   </div>
   <div class="container">
     <!-- Métodos de pago aceptados, parte de Openpay -->
@@ -86,10 +86,10 @@
             <label>Fecha de expiración</label>
             <div class="row">
               <div class="col s5">
-                <input type="number" maxlength="2" placeholder="Mes" data-openpay-card="expiration_month" id="expiration_month" min="1" max="12" onchange="if(this.value.length === 1 )this.value='0' + this.value;" oninput="if(parseInt(this.value) > 1 && parseInt(this.value) < 10 && this.value.length===1 ) this.value='0' + this.value;" required>
+                <input type="number" maxlength="2" placeholder="Mes" autocomplete="off" data-openpay-card="expiration_month" id="expiration_month" min="1" max="12" onchange="if(this.value.length === 1 )this.value='0' + this.value;" oninput="if(parseInt(this.value) > 1 && parseInt(this.value) < 10 && this.value.length===1 ) this.value='0' + this.value;" required>
               </div>
               <div class="col s5">
-                <input type="number" maxlength="2" placeholder="Año" data-openpay-card="expiration_year" id="expiration_year" min="18" max="99" required>
+                <input type="number" maxlength="2" placeholder="Año" autocomplete="off" data-openpay-card="expiration_year" id="expiration_year" min="18" max="99" required>
               </div>
             </div>
           </div>
@@ -129,16 +129,16 @@
         </div>
         <div class="row">
           <div class="col s12 m6 input-field">
-            <select id="product" name="product" required>
-              <option value="" data-amount="" disabled selected>Selecciona una opción...</option>
-            </select>
-            <label>Selecciona el tipo de donativo</label>
-          </div>
-          <div class="col s12 m6 input-field">
             <select id="committee" name="committee" required>
               <option value="" disabled selected>Selecciona una opción...</option>
             </select>
             <label>¿Con qué oficina local realizaste tu proceso?</label>
+          </div>
+          <div class="col s12 m6 input-field">
+            <select id="product" name="product" required>
+              <option value="" data-amount="" disabled selected>Selecciona primero tu oficina local...</option>
+            </select>
+            <label>Selecciona el tipo de donativo</label>
           </div>
         </div>
       </fieldset>
@@ -195,6 +195,19 @@
             <strong id="ogt-card-amount"></strong>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Discounts Disclaimers, change accordingly when needed -->
+    <div id="disclaimer" class="row hide">
+      <div class="col s12">
+        <p style="text-align: justify;">
+          * La reducción en el monto aplica solo para los donativos en línea realizados en <span style="text-decoration: underline;">https://aiesec.org.mx/donativo</span> los días 29 y 30 de Abril.
+          La reducción en el monto no aplica para procesos realizados con la Oficina Nacional, o con pagos identificados bajo la opción "Otro...".
+          <br>Para "Voluntario Global", el monto de $3100 MXN aplica para las primeras 44 personas que realicen su donativo en línea durante el periodo de tiempo especificado.
+          Para "Emprendedor Global", el monto de $3450 MXN aplica para las primeras 20 personas que realicen su donativo en línea durante el periodo de tiempo especificado.
+          Para "Talento Global", el monto de $4550 MXN aplica para las primeras 30 personas que realicen su donativo en línea durante el periodo de tiempo especificado. 
+        </p>
       </div>
     </div>
   </div>

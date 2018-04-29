@@ -8,10 +8,8 @@ require_once './constants.php';
 	for the payments info.
 */
 
-print_r($_POST);
-
 $test = TRUE;
-$redis = new Predis\Client(['port' => 6380]);
+$redis = new Predis\Client(['port' => 6380]); //Docker's redis instance is on port 6380
 
 //Load config file, if cannot load, then send error because we won't be able to load Openpay keys
 try{
@@ -23,7 +21,6 @@ try{
 		// If so, send back to donation form, in case it's a human
 		header("Location:https://aiesec.org.mx/donation/?error=validation");
 	}
-	echo "Valid data <br>\n";
 } catch (Exception $e) {
 	$lc_n=$_POST["committee"];
         $logdataa=date('[Y/m/d H:i:s]').": 500 Could not Load, $lc_n, ".$e->getMessage().PHP_EOL;
@@ -42,20 +39,18 @@ if (!$test) {
 	Openpay::setApiKey($configs['openpay_private_key']);
 	Openpay::setProductionMode(true);
 	$openpay = Openpay::getInstance($configs['openpay_id'],$configs['openpay_private_key']);
-	echo "Set Production Keys, Done! <br>\n";
+	//echo "Set Production Keys, Done! <br>\n";
 }
 else {
 	Openpay::setSandboxMode(true);
 	$openpay = Openpay::getInstance($configs['openpay_sandbox_id'],$configs['openpay_sandbox_private_key']);
-	echo "Set Sandbox Keys, Done! <br>\n";
+	// "Set Sandbox Keys, Done! <br>\n";
 }
 
 
 // Set fields for Openpay charge
 $product = $_POST[PRODUCT_FIELD];
 $product_full = $redis->hget(REDIS_PROD.":".$product,"name"); // Product Full Name
-// Saves whether there is a discount going on
-$discount = $redis->exists(DISCOUNTS[$product]);
 
 $ey_tag = $_POST[EY_FIELD]; // This tag serves for unidentified donations, marked as "Fondo Perdido" (lost fund)
 // Who to send the emails. Unidentified donations shall go to MCVP F&L and corresponding MCVP Operations (i.e. VAM)
@@ -67,12 +62,29 @@ $product_mail = $redis->hget(REDIS_EY.":".$targetEy,$product);
 
 // Checks with Redis whether amount is correct. If it's incorrect, redirects back to form
 // Logic: If there is discount, then check discounted price, if not, then check regular price
+
+// PART 1: Added this bit for discount strategy. In the future, don't allow for eys with exceptions!!!
+if($targetEy !== "VAM" ) {
+// END PART 1
+
+// Saves whether there is a discount going on
+$discount = $redis->exists(DISCOUNTS[$product]);
 if( !( $discount ? (int)$redis->hget(REDIS_PROD.":".$product,REDIS_DISCOUNT) === $amount :
 	(int)$redis->hget(REDIS_PROD.":".$product,REDIS_AMOUNT) === $amount) ) {
-	echo "Amount is INCORRECT<br>"; //TO-DO: Redirect to payment form with amount error
-	//header("Location:https://aiesec.org.mx/donation/?error=amount");
-	die();
+	// "Amount is INCORRECT<br>";
+	//die(); //DELETE this on production
+	header("Location:https://aiesec.org.mx/donation/?error=amount");
 }
+
+// PART 2 of the bit added for discount strategy.
+// If it falls through this else if it is VAM, then check regular amount
+} else if((int)$redis->hget(REDIS_PROD.":".$product,REDIS_AMOUNT) !== $amount ) {
+	//echo "Amount is INCORRECT<br>";
+	//die(); //DELETE this on production
+	header("Location:https://aiesec.org.mx/donation/?error=amount");
+}
+//END PART 2
+//END of bit added
 
 //Create the carge in Openpay (this is the part involving money, beware)
 try {
@@ -95,6 +107,11 @@ try {
 	);
 
 	$charge = $openpay->charges->create($chargeData);
+	//If we arrive to this part of the code it means charge was successful, thus increase discount counter
+	if($discount && $targetEy !== "VAM") { //added special case for VAM
+		$redis->incr(DISCOUNTS[$product]); // Another discounted donation has been submitted
+		validateDonations(); // Checks whether all donations have been handed out
+	}
 	//var_dump($charge);
 	//$charge = (array)$charge;
 	//getting the mail body
@@ -113,13 +130,12 @@ try {
 	$mail_body = str_replace("{card}",substr($charge->card->card_number,-4),$mail_body);
 
 	//sending confirmation mail
-	echo $finance_mail." -> Finance Mail <br>";
-	echo $product_mail." -> Product Mail <br>";
+	//echo "<br><br><strong>Enviando correo, revisa tu bandeja con tu comprobante del donativo.</strong>";
 
 	$mail = new PHPMailer(); // create a new object
 	$mail->CharSet = "UTF-8";
 	$mail->IsSMTP();
-	$mail->SMTPDebug = 1; // debugging: 1 = errors and messages, 2 = messages only
+	//$mail->SMTPDebug = 1; // debugging: 1 = errors and messages, 2 = messages only
 	$mail->SMTPAuth = true; // authentication enabled
 	$mail->SMTPSecure = 'ssl'; // secure transfer enabled REQUIRED for Gmail
 	$mail->Host = "smtp.gmail.com";
@@ -134,8 +150,9 @@ try {
 	if(!$test) {
 		$mail->addCC($finance_mail);
 		$mail->addCC($product_mail);
+		$mail->addCC('finance.legal@aiesec.org.mx'); //Copiar MCVP F&L
 	}
-	$mail->addCC('webmaster@aiesec.org.mx');
+	$mail->addCC('webmaster@aiesec.org.mx'); //Copiar MCVP IM to identify possible bugs
 	$mail->Send();
 
 	if($discount === true) {
@@ -145,11 +162,12 @@ try {
 		file_put_contents("./discounted_donations.log",$logdataa,FILE_APPEND);
 	}
 
-	echo "<br><br><strong>Hecho, revisa tu correo para obtener tu comprobante.</strong>";
+	//echo "<br><br><strong>Hecho, revisa tu correo para obtener tu comprobante.</strong>";
 
-	if(!$test) {
+	header("Location:https://aiesec.org.mx/gracias-por-tu-donativo/");
+	/* if(!$test) {
 		header("Location:https://aiesec.org.mx/gracias-por-tu-donativo/");
-	}
+	} */
 
 // To improve from legacy: Add all the recommended Openpay Exceptions pls!
 } catch (Exception $e) {
@@ -171,4 +189,15 @@ function validateData() {
 	$validation &= isset($_POST[TOKEN_FIELD]);
 	$validation &= isset($_POST[AMOUNT_FIELD]);
 	return $validation;
+}
+
+function validateDonations() {
+	global $redis;
+	global $product;
+
+	//If we've reached the limit of discounts for the product, then disable the discount
+	if($redis->exists(DISCOUNTS[$product]) && $redis->exists(DISCOUNT_LIMIT[$product])
+		&& $redis->get(DISCOUNTS[$product]) >= $redis->get(DISCOUNT_LIMIT[$product])) {
+		$redis->del(DISCOUNTS[$product]);
+	}	
 }
