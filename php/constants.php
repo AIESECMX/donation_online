@@ -19,16 +19,17 @@ define("AMOUNT_FIELD","amount");
 define("FONDO_PERDIDO","Fondo Perdido");
 
 // Redis store constants
-define("DISCOUNT_LIMIT",array(
+const DISCOUNT_LIMIT = array(
   OGV => "ogv_discount_limit",
   OGT => "ogt_discount_limit",
   OGE => "oge_discount_limit",
-));
-define("DISCOUNTS",array(
+);
+
+const DISCOUNTS = array(
   OGV => "ogv_discount",
   OGT => "ogt_discount",
   OGE => "oge_discount",
-)); // These are set in Redis when there's a discount strategy for the product, and unset otherwise
+); // These are set in Redis when there's a discount strategy for the product, and unset otherwise
 define("REDIS_EY","eys");
 define("REDIS_PROD","products");
 
