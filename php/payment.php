@@ -14,7 +14,7 @@ $redis = new Predis\Client(['port' => 6380]); //Docker's redis instance is on po
 //Load config file, if cannot load, then send error because we won't be able to load Openpay keys
 try{
 	$url = "payment_config.php";
-	if(!test) {
+	if(!$test) {
 		$url = "/home/webmaster/wp-config-files/".$url;
 	} else {
 		$url = "../".$url;
