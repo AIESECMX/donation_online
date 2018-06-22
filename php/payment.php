@@ -13,7 +13,14 @@ $redis = new Predis\Client(['port' => 6380]); //Docker's redis instance is on po
 
 //Load config file, if cannot load, then send error because we won't be able to load Openpay keys
 try{
-	$configs = include('../payment_config.php');
+	$url = "payment_config.php";
+	if(!test) {
+		$url = "/home/webmaster/wp-config-files/".$url;
+	} else {
+		$url = "../".$url;
+	}
+
+	$configs = include($url);
 
 	// If $_POST data is not valid, then it might be a bot POSTing into the server
 	// or something went wrong with validation in ../index.html
