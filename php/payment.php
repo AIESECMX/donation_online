@@ -150,8 +150,8 @@ try {
 	$mail->IsHTML(true);
 	$mail->Username = $configs["mailing_adress"];
 	$mail->Password = $configs["mailing_adress_pass"];
-	$mail->SetFrom($configs["mailing_adress"],"AIESEC M\u{00E9}xico A.C.");
-	$mail->Subject = "Donativo a AIESEC M\u{00E9}xico A.C.";
+	$mail->SetFrom($configs["mailing_adress"],"AIESEC Mexico A.C.");
+	$mail->Subject = "Donativo a AIESEC Mexico A.C.";
 	$mail->Body = $mail_body;
 	$mail->AddAddress($_POST[EMAIL_FIELD]);
 	if(!$test) {
