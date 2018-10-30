@@ -30,6 +30,8 @@ const DISCOUNTS = array(
   OGT => "ogt_discount",
   OGE => "oge_discount",
 ); // These are set in Redis when there's a discount strategy for the product, and unset otherwise
+
+define("LOCAL_DISCOUNTS","localDiscounts");
 define("REDIS_EY","eys");
 define("REDIS_PROD","products");
 

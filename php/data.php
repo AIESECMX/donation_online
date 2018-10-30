@@ -32,6 +32,16 @@ if( !$redis->exists(REDIS_EY) || !$redis->exists(REDIS_PROD) ) {
       "ogt" => isset($ey->ogt)?$ey->ogt:null,
       "oge" => isset($ey->oge)?$ey->oge:null,
     ));
+    if (isset($ey->localDiscount)) {
+      if(isset($ey->localDiscount->ogv)) {
+        $redis->sadd(LOCAL_DISCOUNTS,$ey->name);
+        $redis->hmset(LOCAL_DISCOUNTS.":".$ey->name,array(
+          "ogv" => isset($ey->localDiscount->ogv)?$ey->localDiscount->ogv:null,
+          "ogt" => isset($ey->localDiscount->ogt)?$ey->localDiscount->ogt:null,
+          "oge" => isset($ey->localDiscount->oge)?$ey->localDiscount->oge:null,
+        ));
+      }
+    }
   }
 }
 
@@ -55,6 +65,22 @@ foreach ($redis_prods as $product) {
   $products[] = $temp;
 }
 $out->products = $products;
+
+//Retrieve all Discounted EYs and form array
+$discounts = [];
+$redis_eynames = $redis->smembers(LOCAL_DISCOUNTS);
+foreach ($redis_eynames as $eyname) {
+  $temp = (object)$redis->hgetall(LOCAL_DISCOUNTS.":".$eyname);
+
+  //Convert to integer from strings. (Note in globalDiscount: Empty string shall mean null)
+  $temp->ogv = $temp->ogv === "" ? null : intval($temp->ogv);
+  $temp->ogt = $temp->ogt === "" ? null : intval($temp->ogt);
+  $temp->oge = $temp->oge === "" ? null : intval($temp->oge);
+  $temp->name = $eyname;
+
+  $discounts[] = $temp;
+}
+$out->localDiscounts = $discounts;
 
 //Retrieve EYs from Redis and form array
 $eys = [];

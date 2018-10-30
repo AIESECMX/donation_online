@@ -2,12 +2,6 @@
 require_once '../vendor/autoload.php';
 require_once './constants.php';
 
-/*
-	TO-DO: Still need to exclude virtual expansions from the promo. Check with Kenia if this is
-	going to be the case, or if all people will have the same pricing and VAM will just not count
-	for the payments info.
-*/
-
 $test = FALSE;
 $redis = new Predis\Client(['port' => 6380]); //Docker's redis instance is on port 6380
 
@@ -70,28 +64,18 @@ $product_mail = $redis->hget(REDIS_EY.":".$targetEy,$product);
 // Checks with Redis whether amount is correct. If it's incorrect, redirects back to form
 // Logic: If there is discount, then check discounted price, if not, then check regular price
 
-// PART 1: Added this bit for discount strategy. In the future, don't allow for eys with exceptions!!!
-if($targetEy !== "VAM" ) {
-// END PART 1
+// Saves whether there is a global discount going on
+$globalDiscount = $redis->exists(DISCOUNTS[$product]);
+$localDiscount = $redis->hexists(LOCAL_DISCOUNTS.":".$targetEy,$product);
 
-// Saves whether there is a discount going on
-$discount = $redis->exists(DISCOUNTS[$product]);
-if( !( $discount ? (int)$redis->hget(REDIS_PROD.":".$product,REDIS_DISCOUNT) === $amount :
-	(int)$redis->hget(REDIS_PROD.":".$product,REDIS_AMOUNT) === $amount) ) {
-	// "Amount is INCORRECT<br>";
-	//die(); //DELETE this on production
+if( $globalDiscount && (int)$redis->hget(REDIS_PROD.":".$product,REDIS_DISCOUNT) !== $amount ||
+		$localDiscount && (int)$redis->hget(LOCAL_DISCOUNTS.":".$targetEy,$product) !== $amount ||
+		!$globalDiscount && !$localDiscount && (int)$redis->hget(REDIS_PROD.":".$product,REDIS_AMOUNT) !== $amount) {
+	// echo "Amount is INCORRECT<br>";
+	// die(); // DELETE this on production
 	header("Location:https://aiesec.org.mx/donation/?error=amount");
+	die();
 }
-
-// PART 2 of the bit added for discount strategy.
-// If it falls through this else if it is VAM, then check regular amount
-} else if((int)$redis->hget(REDIS_PROD.":".$product,REDIS_AMOUNT) !== $amount ) {
-	//echo "Amount is INCORRECT<br>";
-	//die(); //DELETE this on production
-	header("Location:https://aiesec.org.mx/donation/?error=amount");
-}
-//END PART 2
-//END of bit added
 
 //Create the carge in Openpay (this is the part involving money, beware)
 try {
@@ -115,7 +99,7 @@ try {
 
 	$charge = $openpay->charges->create($chargeData);
 	//If we arrive to this part of the code it means charge was successful, thus increase discount counter
-	if($discount && $targetEy !== "VAM") { //added special case for VAM
+	if($globalDiscount) { //added special case for VAM
 		$redis->incr(DISCOUNTS[$product]); // Another discounted donation has been submitted
 		validateDonations(); // Checks whether all donations have been handed out
 	}
@@ -162,26 +146,27 @@ try {
 	$mail->addCC('webmaster@aiesec.org.mx'); //Copiar MCVP IM to identify possible bugs
 	$mail->Send();
 
-	if($discount === true) {
+	if($globalDiscount == true || $localDiscount == true) {
 		//Discount logging
 		$lc_n=$_POST["committee"];
-		$logdataa=date('[Y/m/d H:i:s]').": $firstName $lastName, $lc_n".PHP_EOL;
+		$logdataa=date('[Y/m/d H:i:s]').": $firstName $lastName, $lc_n, $product_full".PHP_EOL;
 		file_put_contents("./discounted_donations.log",$logdataa,FILE_APPEND);
 	}
 
-	//echo "<br><br><strong>Hecho, revisa tu correo para obtener tu comprobante.</strong>";
-
-	header("Location:https://aiesec.org.mx/gracias-por-tu-donativo/");
-	/* if(!$test) {
+	if(!$test) {
 		header("Location:https://aiesec.org.mx/gracias-por-tu-donativo/");
-	} */
+	} else {
+		echo "Payment done!";
+		die();
+	}
 
 // To improve from legacy: Add all the recommended Openpay Exceptions pls!
 } catch (Exception $e) {
 	$lc_n=$_POST["committee"];
         $logdataa=date('[Y/m/d H:i:s]').": $firstName $lastName, $lc_n, ".$e->getMessage().PHP_EOL;
         file_put_contents("./error.log",$logdataa,FILE_APPEND);
-	header("Location:https://aiesec.org.mx/error_de_transaccion/?err=".$e->getMessage());		
+	header("Location:https://aiesec.org.mx/error_de_transaccion/?err=".$e->getMessage());	
+	die();	
 }
 
 function validateData() {
