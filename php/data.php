@@ -33,7 +33,7 @@ if( !$redis->exists(REDIS_EY) || !$redis->exists(REDIS_PROD) ) {
       "oge" => isset($ey->oge)?$ey->oge:null,
     ));
     if (isset($ey->localDiscount)) {
-      if(isset($ey->localDiscount->ogv)) {
+      if(isset($ey->localDiscount->ogv) || isset($ey->localDiscount->ogt) || isset($ey->localDiscount->oge)) {
         $redis->sadd(LOCAL_DISCOUNTS,$ey->name);
         $redis->hmset(LOCAL_DISCOUNTS.":".$ey->name,array(
           "ogv" => isset($ey->localDiscount->ogv)?$ey->localDiscount->ogv:null,
