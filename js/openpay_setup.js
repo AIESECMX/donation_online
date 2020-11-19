@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  var sandbox = true; // Specify false to enable for production
+  var sandbox = false; // Specify false to enable for production
 
   if(!sandbox) {
     OpenPay.setId('mwgdi1x7t1wmrhf1dxbj');

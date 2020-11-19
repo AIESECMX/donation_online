@@ -2,7 +2,7 @@
 require_once '../vendor/autoload.php';
 require_once './constants.php';
 
-$test = TRUE;
+$test = FALSE;
 $redis = new Predis\Client(['port' => 6380]); //Docker's redis instance is on port 6380
 
 //Load config file, if cannot load, then send error because we won't be able to load Openpay keys
