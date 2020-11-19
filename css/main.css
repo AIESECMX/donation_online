@@ -274,12 +274,11 @@ a.button.disabled {
 
 
 #c1, #c2 {
-    width: 33% ; // 1/3 of 100%
+    width: 33% ;
 }
 
 #c3 {
     width: auto ;
-    //or width:34% ;
 }
 #div_blue{
     background-color: #037Ef3 ;
