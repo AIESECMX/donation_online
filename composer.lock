@@ -1,35 +1,37 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "9309c1015585c5e3ca16ac152e84e1b4",
     "packages": [
         {
             "name": "google/recaptcha",
-            "version": "1.1.3",
+            "version": "1.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/google/recaptcha.git",
-                "reference": "5a56d15ca10a7b75158178752b2ad8f755eb4f78"
+                "reference": "614f25a9038be4f3f2da7cbfd778dc5b357d2419"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/google/recaptcha/zipball/5a56d15ca10a7b75158178752b2ad8f755eb4f78",
-                "reference": "5a56d15ca10a7b75158178752b2ad8f755eb4f78",
+                "url": "https://api.github.com/repos/google/recaptcha/zipball/614f25a9038be4f3f2da7cbfd778dc5b357d2419",
+                "reference": "614f25a9038be4f3f2da7cbfd778dc5b357d2419",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.5"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.8"
+                "friendsofphp/php-cs-fixer": "^2.2.20|^2.15",
+                "php-coveralls/php-coveralls": "^2.1",
+                "phpunit/phpunit": "^4.8.36|^5.7.27|^6.59|^7.5.11"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.1.x-dev"
+                    "dev-master": "1.2.x-dev"
                 }
             },
             "autoload": {
@@ -41,28 +43,33 @@
             "license": [
                 "BSD-3-Clause"
             ],
-            "description": "Client library for reCAPTCHA, a free service that protect websites from spam and abuse.",
-            "homepage": "http://www.google.com/recaptcha/",
+            "description": "Client library for reCAPTCHA, a free service that protects websites from spam and abuse.",
+            "homepage": "https://www.google.com/recaptcha/",
             "keywords": [
                 "Abuse",
                 "captcha",
                 "recaptcha",
                 "spam"
             ],
-            "time": "2017-03-09T18:44:34+00:00"
+            "support": {
+                "forum": "https://groups.google.com/forum/#!forum/recaptcha",
+                "issues": "https://github.com/google/recaptcha/issues",
+                "source": "https://github.com/google/recaptcha"
+            },
+            "time": "2020-03-31T17:50:54+00:00"
         },
         {
             "name": "openpay/sdk",
-            "version": "1.2.0",
+            "version": "1.4.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/open-pay/openpay-php.git",
-                "reference": "6ec357af74453eccf94aa103f91d661277cb8cad"
+                "reference": "ffebe70c0d49a7877d858c61ea5266058a61ff41"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/open-pay/openpay-php/zipball/6ec357af74453eccf94aa103f91d661277cb8cad",
-                "reference": "6ec357af74453eccf94aa103f91d661277cb8cad",
+                "url": "https://api.github.com/repos/open-pay/openpay-php/zipball/ffebe70c0d49a7877d858c61ea5266058a61ff41",
+                "reference": "ffebe70c0d49a7877d858c61ea5266058a61ff41",
                 "shasum": ""
             },
             "require": {
@@ -91,25 +98,29 @@
                 },
                 {
                     "name": "Federico Balderas",
-                    "email": "federico.balderas@foograde.com",
-                    "homepage": "http://foograde.com"
+                    "email": "federico.balderas@openpay.mx",
+                    "homepage": "https://openpay.mx"
                 }
             ],
             "description": "This is a client implementing the payment services for Openpay at openpay.mx",
-            "time": "2016-06-22T18:41:51+00:00"
+            "support": {
+                "issues": "https://github.com/open-pay/openpay-php/issues",
+                "source": "https://github.com/open-pay/openpay-php/tree/master"
+            },
+            "time": "2020-06-18T21:48:07+00:00"
         },
         {
             "name": "phpmailer/phpmailer",
-            "version": "v5.2.26",
+            "version": "v5.2.28",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "70362997bda4376378be7d92d81e2200550923f7"
+                "reference": "acba50393dd03da69a50226c139722af8b153b11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/70362997bda4376378be7d92d81e2200550923f7",
-                "reference": "70362997bda4376378be7d92d81e2200550923f7",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/acba50393dd03da69a50226c139722af8b153b11",
+                "reference": "acba50393dd03da69a50226c139722af8b153b11",
                 "shasum": ""
             },
             "require": {
@@ -157,12 +168,12 @@
             ],
             "authors": [
                 {
-                    "name": "Jim Jagielski",
-                    "email": "jimjag@gmail.com"
-                },
-                {
                     "name": "Marcus Bointon",
                     "email": "phpmailer@synchromedia.co.uk"
+                },
+                {
+                    "name": "Jim Jagielski",
+                    "email": "jimjag@gmail.com"
                 },
                 {
                     "name": "Andy Prevost",
@@ -173,26 +184,45 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2017-11-04T09:26:05+00:00"
+            "support": {
+                "issues": "https://github.com/PHPMailer/PHPMailer/issues",
+                "source": "https://github.com/PHPMailer/PHPMailer/tree/v5.2.28"
+            },
+            "funding": [
+                {
+                    "url": "https://marcus.bointon.com/donations/",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/Synchro",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/marcusbointon",
+                    "type": "patreon"
+                }
+            ],
+            "time": "2020-03-19T14:29:37+00:00"
         },
         {
             "name": "predis/predis",
-            "version": "v1.1.1",
+            "version": "v1.1.6",
             "source": {
                 "type": "git",
-                "url": "https://github.com/nrk/predis.git",
-                "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1"
+                "url": "https://github.com/predis/predis.git",
+                "reference": "9930e933c67446962997b05201c69c2319bf26de"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nrk/predis/zipball/f0210e38881631afeafb56ab43405a92cafd9fd1",
-                "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1",
+                "url": "https://api.github.com/repos/predis/predis/zipball/9930e933c67446962997b05201c69c2319bf26de",
+                "reference": "9930e933c67446962997b05201c69c2319bf26de",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.9"
             },
             "require-dev": {
+                "cweagans/composer-patches": "^1.6",
                 "phpunit/phpunit": "~4.8"
             },
             "suggest": {
@@ -200,6 +230,18 @@
                 "ext-phpiredis": "Allows faster serialization and deserialization of the Redis protocol"
             },
             "type": "library",
+            "extra": {
+                "composer-exit-on-patch-failure": true,
+                "patches": {
+                    "phpunit/phpunit-mock-objects": {
+                        "Fix PHP 7 and 8 compatibility": "./tests/phpunit_mock_objects.patch"
+                    },
+                    "phpunit/phpunit": {
+                        "Fix PHP 7 compatibility": "./tests/phpunit_php7.patch",
+                        "Fix PHP 8 compatibility": "./tests/phpunit_php8.patch"
+                    }
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Predis\\": "src/"
@@ -213,17 +255,33 @@
                 {
                     "name": "Daniele Alessandri",
                     "email": "suppakilla@gmail.com",
-                    "homepage": "http://clorophilla.net"
+                    "homepage": "http://clorophilla.net",
+                    "role": "Creator & Maintainer"
+                },
+                {
+                    "name": "Till Krüss",
+                    "homepage": "https://till.im",
+                    "role": "Maintainer"
                 }
             ],
             "description": "Flexible and feature-complete Redis client for PHP and HHVM",
-            "homepage": "http://github.com/nrk/predis",
+            "homepage": "http://github.com/predis/predis",
             "keywords": [
                 "nosql",
                 "predis",
                 "redis"
             ],
-            "time": "2016-06-16T16:22:20+00:00"
+            "support": {
+                "issues": "https://github.com/predis/predis/issues",
+                "source": "https://github.com/predis/predis/tree/v1.1.6"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sponsors/tillkruss",
+                    "type": "github"
+                }
+            ],
+            "time": "2020-09-11T19:18:05+00:00"
         }
     ],
     "packages-dev": [],
@@ -233,5 +291,6 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "2.0.0"
 }

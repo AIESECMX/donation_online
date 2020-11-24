@@ -9,14 +9,12 @@ $(document).ready(function() {
     OpenPay.setApiKey('pk_4981f6da36014523948d66211ba56258');
   }
   OpenPay.setSandboxMode(sandbox);
-  var deviceSessionId = OpenPay.deviceData.setup("payment-form", "deviceIdHiddenFieldName");
+  OpenPay.deviceData.setup("payment-form", "deviceIdHiddenFieldName");
 
   $('#pay-button').on('click', function(event) {
-    if(true || checkFields()){
-      event.preventDefault();
+    event.preventDefault();
+    if(true || checkFields()){ // Ignore validations for now
       $("#pay-button").prop("disabled", true);
-      //console.log(OpenPay);
-      //console.log(OpenPay.token);
       OpenPay.token.extractFormAndCreate('payment-form', success_callback, error_callback); 
     }               
   });
@@ -106,7 +104,6 @@ function checkFields(){
 
     return false;   
 }
-//console.log(document.getElementById("terms").checked);
 return true;
 
 }
