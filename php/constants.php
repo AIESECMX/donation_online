@@ -12,7 +12,7 @@ define("FIRST_NAME_FIELD","epFirstName");
 define("LAST_NAME_FIELD","epLastName");
 define("EMAIL_FIELD","email");
 define("PHONE_FIELD","phone_number");
-define("PRODUCT_FIELD","product");
+define("PRODUCT_FIELD","duration");
 define("EY_FIELD","committee");
 define("ANTIFRAUD_FIELD","deviceIdHiddenFieldName");
 define("TOKEN_FIELD","token_id");

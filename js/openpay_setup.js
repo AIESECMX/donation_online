@@ -22,7 +22,7 @@ $(document).ready(function() {
   var success_callback = function(response) {
     var token_id = response.data.id;
 
-    var eyDOM = document.getElementById("product");
+    var eyDOM = document.getElementById("duration");
 
     var product = eyDOM.children[eyDOM.selectedIndex].value;
     var amount = eyDOM.children[eyDOM.selectedIndex].dataset.amount;
