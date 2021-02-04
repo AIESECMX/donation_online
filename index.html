@@ -139,13 +139,17 @@
             <select id="committee" name="committee" required>
               <option value="" disabled selected>Selecciona una opción...</option>
             </select>
-            <label>¿Con qué oficina local realizaste tu proceso?</label>
+            <label for="committee">¿Con qué oficina local realizaste tu proceso?</label>
           </div>
           <div class="col s12 m6 input-field">
-            <select id="product" name="product" required>
-              <option value="" data-amount="" disabled selected>Selecciona primero tu oficina local...</option>
+            <select id="product" name="product" required></select>
+            <label for="product">Selecciona el producto</label>
+          </div>
+          <div class="col s12 m6 input-field">
+            <select id="duration" name="duration" required>
+              <option value="" data-amount="" disabled selected>Selecciona primero el producto...</option>
             </select>
-            <label>Selecciona el tipo de donativo</label>
+            <label for="duration">¿Cuál es la duración de tu intercambio?</label>
           </div>
         </div>
       </fieldset>
@@ -170,7 +174,10 @@
             <img src="./css/gv.png" alt="Logo Voluntario Global" />
           </div>
           <div class="card-action center-align">
-            Donativo: <strong id="ogv-card-amount">$4950 MXN</strong><br>&nbsp;
+            <p>Donativo:*</p>
+            <ul>
+              <li><strong>$7500 MXN</strong> - 6 semanas</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -180,8 +187,13 @@
             <img src="./css/gta.png" alt="Logo Talento Global" />
           </div>
           <div class="card-action center-align">
-            Donativo: <strong id="ogt-card-amount">$6950 MXN</strong><br>
-            <strong id="ogt-card-amount">$5450 MXN</strong> (Corto Plazo)<br>
+            <p>Donativo:*</p>
+            <ul>
+              <li><strong>$8000 MXN</strong> - 6 semanas</li>
+              <li><strong>$8600 MXN</strong> - 8 semanas</li>
+              <li><strong>$9700 MXN</strong> - 12 semanas</li>
+              <li><strong>$12200 MXN</strong> - 6 meses</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -191,10 +203,17 @@
             <img src="./css/gte.png" alt="Logo Profesor Global" />
           </div>
           <div class="card-action center-align">
-            Donativo: <strong id="ogta-card-amount">$6950 MXN</strong><br>&nbsp;
+            <p>Donativo:*</p>
+            <ul>
+              <li><strong>$12200 MXN</strong> - 6 meses</li>
+            </ul>
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="row">
+      <p><strong>*</strong> Los montos especificados incluyen el monto correspondiente al donativo a AIESEC México A.C. y al seguro de gastos médicos mayores.</p>
     </div>
 
   <!-- Openpay Icons -->
@@ -236,7 +255,7 @@
   </script>
 
   <!-- Load all Donation, LCs and set openpay tokenizer -->
-  <script src="./js/data_config-1.2.0.js"></script>
+  <script src="./js/data_config-1.3.0.js"></script>
   <script src="./js/openpay_setup.js"></script>
 </body>
 

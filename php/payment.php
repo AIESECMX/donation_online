@@ -21,6 +21,7 @@ try{
 	if(!validateData()) {
 		// If so, send back to donation form, in case it's a human
 		header("Location:https://aiesec.org.mx/donation/?error=validation");
+		// die('Validation error');
 	}
 } catch (Exception $e) {
 	$lc_n=$_POST["committee"];
@@ -47,7 +48,6 @@ else {
 	$openpay = Openpay::getInstance($configs['openpay_sandbox_id'],$configs['openpay_sandbox_private_key']);
 	// "Set Sandbox Keys, Done! <br>\n";
 }
-
 
 // Set fields for Openpay charge
 $product = $_POST[PRODUCT_FIELD];
@@ -131,7 +131,7 @@ try {
 		$mail->addCC($product_mail);
 		$mail->addCC('finance.legal@aiesec.org.mx'); //Copiar MCVP F&L
 	}
-	$mail->addCC('webmaster@aiesec.org.mx'); //Copiar MCVP IM to identify possible bugs
+	$mail->addCC('admin@aiesec.org.mx'); //Copy admin to identify possible bugs
 	$mail->Send();
 
 	if(!$test) {
@@ -154,7 +154,7 @@ function validateData() {
 	$validation = isset($_POST[FIRST_NAME_FIELD]) && $_POST[FIRST_NAME_FIELD]!=="" ;
 	$validation &= isset($_POST[LAST_NAME_FIELD]) && $_POST[LAST_NAME_FIELD]!=="" ;
 	$validation &= isset($_POST[EMAIL_FIELD]) && filter_var($_POST[EMAIL_FIELD], FILTER_VALIDATE_EMAIL);
-	$validation &= isset($_POST[PRODUCT_FIELD]) && in_array($_POST[PRODUCT_FIELD],[OGV,OGTA,OGTA_ST,OGTE]);
+	// $validation &= isset($_POST[PRODUCT_FIELD]) && in_array($_POST[PRODUCT_FIELD],[OGV,OGTA,OGTA_ST,OGTE]);
 	$validation &= isset($_POST[EY_FIELD]);
 	$validation &= isset($_POST[PHONE_FIELD]);
 	$validation &= isset($_POST[ANTIFRAUD_FIELD]);
